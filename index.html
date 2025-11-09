@@ -1,0 +1,143 @@
+<!DOCTYPEhtml> 
+<htmllang="en"> 
+<head> 
+<metacharset="UTF-8"/> 
+<metaname="viewport"content="width=device-width,initial- scale=1.0" /> 
+<title>🌈RESTFULCONTACTMANAGEMENTAPI</title> 
+<style>/*🌈Responsive,colorfuldesign*/ body 
+{ 
+margin:0; 
+font-family:"Poppins",sans-serif; 
+background:linear-gradient(120deg,#6a11cb,#2575fc); color: #333; display:flex; flex-direction:column; min-height: 100vh; 
+} 
+ 
+header{ 
+text-align:center; padding: 20px; color: white; text-shadow:2px2px6pxrgba(0,0,0,0.3); 
+} 
+ 
+main { 
+flex:1; display:flex; flex-direction:column; align-items: center; padding:15px; 
+} 
+ 
+.form-section,.search-section{ display: flex; flex-wrap:wrap; gap: 10px; margin: 10px; justify-content:center; 
+} 
+ 
+input { 
+padding:10px; border-radius: 10px; border:1pxsolid#ccc; flex: 1 1 200px; font-size:14px; transition:0.3s; 
+} 
+ 
+input:focus{ 
+border-color:#6a11cb; 
+box-shadow: 0 0 10px rgba(106,17,203,0.4); outline: none; 
+} 
+ 
+button{ 
+padding:10px15px; border: none; border-radius:10px; cursor: pointer; color: white; font-weight:bold; background:linear-gradient(45deg,#ff512f,#f09819); transition: 0.3s; 
+} 
+button:hover { transform:scale(1.05); opacity: 0.9; 
+} 
+ 
+table { 
+width:90%; border-collapse:collapse; background: white; border-radius: 12px; overflow: hidden; margin: 15px 0; 
+} 
+ 
+th, td { 
+padding:12px; text-align:left; 
+} th{ 
+background: linear-gradient(45deg, #36d1dc, #5b86e5); color: white; 
+} 
+tr:nth-child(even){background:#f7f7ff;} tr:hover{background:#e0eaff;} 
+ 
+.edit{ background:linear-gradient(45deg,#56ab2f,#a8e063); 
+} 
+.delete{ background:linear-gradient(45deg,#ff0844,#ffb199); 
+} 
+ 
+footer{ 
+text-align:center; color: white; padding: 10px; font-size: 0.9em; 
+} 
+ 
+@media(max-width:600px){ table, th, td { 
+font-size:12px; 
+} 
+input, button { flex:11100%; 
+} 
+} 
+</style> 
+</head> 
+<body> 
+<header> 
+<h1>🌈RESTFULCONTACTMANAGEMENTAPI🌈</h1> 
+</header> 
+ 
+<main> 
+<sectionclass="form-section"> 
+<inputid="name" placeholder="👤Name"/> 
+<inputid="email"placeholder="📧Email"/> 
+<inputid="phone"placeholder="📱Phone"/> 
+<buttonid="addBtn">➕Add</button> </section> <sectionclass="search-section"> 
+<inputid="search"placeholder="🔍Searchbyname"/> </section> 
+ 
+<sectionclass="table-section"> 
+<tableid="contactsTable"> 
+<thead> 
+ 
+<tr><th>Name</th><th>Email</th><th>Phone</th><th>Actions </th></tr> 
+</thead> 
+<tbody></tbody> 
+</table> 
+</section> 
+</main> 
+ 
+<script> constapi='/api/contacts'; 
+ 
+asyncfunctionfetchContacts(){ const res = await fetch(api); const data = await res.json(); 
+renderContacts(data); 
+} 
+ 
+functionrenderContacts(data){ 
+consttbody=document.querySelector('#contactsTabletbody'); tbody.innerHTML = ''; data.forEach(c=>{ 
+constrow=document.createElement('tr'); 
+row.innerHTML = ` 
+<td>${c.name}</td> 
+<td>${c.email}</td> 
+<td>${c.phone}</td> 
+<td> 
+<button class="edit"onclick="editContact(${c.id})">✏️</bu tton> 
+<buttonclass="delete" onclick="deleteContact(${c.id})">🗑️</button> 
+</td>`; tbody.appendChild(row); 
+}); 
+} 
+ 
+asyncfunctionaddContact(){ 
+const name = document.getElementById('name').value.trim(); const email = document.getElementById('email').value.trim(); constphone=document.getElementById('phone').value.trim(); if(!name||!email||!phone) returnalert("Allfieldsarerequired!"); 
+ 
+await fetch(api, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, phone }) 
+}); 
+ 
+document.getElementById('name').value = ''; document.getElementById('email').value = ''; document.getElementById('phone').value=''; fetchContacts(); 
+} 
+ 
+asyncfunctioneditContact(id){ 
+constnewName = prompt("Enternewname:"); const newEmail = prompt("Enter new email:"); constnewPhone=prompt("Enternewphone:"); if(!newName||!newEmail||!newPhone)return; 
+ 
+await fetch(`${api}/${id}`, { 
+method: 'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: newName, email: newEmail, phone: 
+newPhone }) 
+}); 
+fetchContacts(); 
+} asyncfunctiondeleteContact(id) { 
+if(!confirm("Delete thiscontact?"))return; awaitfetch(`${api}/${id}`,{method:'DELETE'}); fetchContacts(); 
+} 
+ 
+document.getElementById('addBtn').addEventListener('click', 
+addContact); document.getElementById('search').addEventListener('input', async 
+e => { constquery=e.target.value.toLowerCase(); 
+const res = await fetch(api); const data = await res.json(); const filtered = data.filter(c => 
+c.name.toLowerCase().includes(query)); renderContacts(filtered); 
+}); 
+ 
+fetchContacts(); 
+</script> 
+</body> 
+</html> 
